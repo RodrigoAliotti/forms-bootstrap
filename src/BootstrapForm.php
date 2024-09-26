@@ -46,6 +46,9 @@ class BootstrapForm extends Form
 	/** @var bool */
 	private $autoShowValidation = true;
 
+	/** @var bool */
+	private $floatingLabel = false;
+
 	/**
 	 * @param IContainer|null $container
 	 */
@@ -69,6 +72,22 @@ class BootstrapForm extends Form
 			$form->showValidation = $this->autoShowValidation;
 		};
 	}
+
+	/*
+    * activate float label - activates according to parameter
+    */
+    public function activeFloatLabel(bool $activate=true):void
+    {
+        $this->floatingLabel = (($activate) && (self::$bootstrapVersion === BootstrapVersion::V5));
+    }
+
+	/*
+    * is float label
+    */
+    public function isFloatLabel():bool
+    {
+        return $this->floatingLabel;
+    }  
 
 	public static function switchBootstrapVersion(int $version): void
 	{

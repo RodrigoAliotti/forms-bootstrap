@@ -181,7 +181,10 @@ class BootstrapRenderer implements FormRenderer
 				Cnf::CLASS_SET => ['alert', 'alert-danger'],
 			],
 
-			Cnf::PAIR => [
+			Cnf::PAIR => ($this->form->isFloatLabel())?[
+				Cnf::ELEMENT_NAME => 'div',
+				Cnf::CLASS_SET => 'form-floating mb-3' ,
+				]:[
 				Cnf::ELEMENT_NAME => 'div',
 				Cnf::CLASS_SET => BootstrapForm::getBootstrapVersion() === BootstrapVersion::V5 ? 'mb-3' : 'form-group',
 			],
@@ -535,6 +538,42 @@ class BootstrapRenderer implements FormRenderer
 	}
 
 	/**
+	* Renders single visual row - with floating label
+	*/
+	public function renderFloatPair(BaseControl $control,Html $pairHtml):string
+	{
+				   
+		$nonLabel = $this->getElem(Cnf::NON_LABEL);
+
+		//region non-label parts
+		$control->setHtmlAttribute('placeholder', $control->getCaption());            
+		$controlHtml = $this->renderControl($control);
+		$feedbackHtml = $this->renderFeedback($control);
+		$descriptionHtml = $this->renderDescription($control);
+
+		if (!empty($controlHtml)) {
+				$nonLabel->addHtml($controlHtml);                        
+		}
+
+		if (!empty($feedbackHtml)) {
+				$nonLabel->addHtml($feedbackHtml);
+		}
+
+		if (!empty($descriptionHtml)) {
+				$nonLabel->addHtml($descriptionHtml);
+		}
+
+		//endregion
+
+		if (!empty($nonLabel)) {
+			$pairHtml->addHtml($nonLabel);
+		}
+		$pairHtml->addHtml($this->renderLabel($control));
+
+		return $pairHtml->render(0);
+	} 
+
+	/**
 	 * Renders single visual row.
 	 */
 	public function renderPair(BaseControl $control): string
@@ -542,6 +581,11 @@ class BootstrapRenderer implements FormRenderer
 		$pairHtml = $this->configElem(Cnf::PAIR);
 
 		$pairHtml->id = $control->getOption(RendererOptions::ID);
+
+		if ($this->form->isFloatLabel())
+        {                
+            return $this->renderFloatPair($control,$pairHtml);
+        } 
 
 		$labelHtml = $this->renderLabel($control);
 		$pairHtml->addHtml($labelHtml);
